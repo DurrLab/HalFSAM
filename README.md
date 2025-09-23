@@ -1,7 +1,10 @@
 # HalFSAM (MICCAI 2025, Oral)
 SAM-based Haustral Fold Detection In Colonoscopy with Debris Suppression and Temporal Consistency
+
 **Paper Link**: https://papers.miccai.org/miccai-2025/paper/4509_paper.pdf
+
 **C3VDv2 Dataset Link**: https://durrlab.github.io/C3VDv2/
+
 ## Updates
 **2025-09-19:** Code and dataset are coming soon!
 ## Abstract
