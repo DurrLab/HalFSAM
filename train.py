@@ -449,8 +449,8 @@ def parse_args():
     
     parser.add_argument('--resume',
                         type=bool,
-                        default=True,
-                        help='use previous trained data')  # Just for test
+                        default=False,
+                        help='use previous trained data')
     parser.add_argument('--checkpoint_data',
                         type=str,
                         default='checkpoints_HalFSAM/C3VDv2/23/23_model.pth',
