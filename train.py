@@ -453,7 +453,7 @@ def parse_args():
                         help='use previous trained data')
     parser.add_argument('--checkpoint_data',
                         type=str,
-                        default='checkpoints_HalFSAM/C3VDv2/23/23_model.pth',
+                        default=None,
                         help='Checkpoint path from which to restore model weights from.')
     
     parser.add_argument('--is_testing',type=bool,
