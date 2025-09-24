@@ -1,0 +1,85 @@
+# @package _global_
+
+# Model
+model:
+  _target_: models.HalFSAM.HalFSAM
+  trunk:
+    _target_: models.backbones.hieradet_adapt.Hiera_adapt
+    embed_dim: 144
+    num_heads: 2
+    stages: [2, 6, 36, 4]
+    global_att_blocks: [23, 33, 43]
+    window_pos_embed_bkg_spatial_size: [7, 7]
+    window_spec: [8, 4, 16, 8]
+  neck:
+    _target_: models.backbones.image_encoder.FpnNeck_w_PE
+    position_encoding:
+      _target_: models.backbones.position_encoding.PositionEmbeddingSine
+      num_pos_feats: 256
+      normalize: true
+      scale: null
+      temperature: 10000
+    d_model: 256
+    backbone_channel_list: [1152, 576, 288, 144]
+    fpn_top_down_levels: [2, 3]  # output level 0 and 1 directly use the backbone features
+    fpn_interp_model: nearest
+
+  memory_attention:
+    _target_: models.backbones.memory_attention.MemoryAttention
+    d_model: 256
+    pos_enc_at_input: true
+    layer:
+      _target_: models.backbones.memory_attention.MemoryAttentionLayer
+      activation: relu
+      dim_feedforward: 2048
+      dropout: 0.1
+      pos_enc_at_attn: false
+      self_attention:
+        _target_: models.backbones.transformer.RoPEAttention
+        rope_theta: 10000.0
+        feat_sizes: [32, 32]
+        embedding_dim: 256
+        num_heads: 1
+        downsample_rate: 1
+        dropout: 0.1
+      d_model: 256
+      pos_enc_at_cross_attn_keys: true
+      pos_enc_at_cross_attn_queries: false
+      cross_attention:
+        _target_: models.backbones.transformer.RoPEAttention
+        rope_theta: 10000.0
+        feat_sizes: [32, 32]
+        rope_k_repeat: True
+        embedding_dim: 256
+        num_heads: 1
+        downsample_rate: 1
+        dropout: 0.1
+        kv_in_dim: 64
+    num_layers: 4
+    num_stages: 4
+
+  memory_encoder:
+      _target_: models.backbones.memory_encoder.MemoryEncoder
+      out_dim: 64
+      position_encoding:
+        _target_: models.backbones.position_encoding.PositionEmbeddingSine
+        num_pos_feats: 64
+        normalize: true
+        scale: null
+        temperature: 10000
+      mask_downsampler:
+        _target_: models.backbones.memory_encoder.MaskDownSampler
+        kernel_size: 3
+        stride: 2
+        total_stride: 32
+        padding: 1
+
+  # num_maskmem: 7
+  # image_size: 1024
+  # apply scaled sigmoid on mask logits for memory encoder, and directly feed input mask as output mask
+  sigmoid_scale_for_mem_enc: 20.0
+  sigmoid_bias_for_mem_enc: -10.0
+  # use_mask_input_as_output_without_sam: true
+  # Memory
+  offload_mem_to_cpu: true
+
